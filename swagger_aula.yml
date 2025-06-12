@@ -1,0 +1,231 @@
+openapi: 3.0.0
+info:
+  title: API de Mensagens
+  description: API para gerenciamento de mensagens simples
+  version: 1.0.0
+servers:
+  - url: http://localhost:6664
+    description: Servidor de desenvolvimento
+tags:
+  - name: Mensagens
+    description: Operações com mensagens
+
+paths:
+  /api/data:
+    get:
+      tags: [Mensagens]
+      summary: Lista todas as mensagens ou filtra por ID
+      parameters:
+        - name: id
+          in: query
+          description: ID da mensagem para filtrar
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista de mensagens ou mensagem específica
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Mensagem'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Mensagem'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    post:
+      tags: [Mensagens]
+      summary: Cria uma nova mensagem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  description: Texto da mensagem
+                  example: "Nova mensagem de exemplo"
+      responses:
+        '201':
+          description: Mensagem criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+        '400':
+          description: Campo message é obrigatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+  /api/data/{id}:
+    get:
+      tags: [Mensagens]
+      summary: Obtém uma mensagem específica por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID da mensagem
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Mensagem encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    put:
+      tags: [Mensagens]
+      summary: Atualiza completamente uma mensagem
+      parameters:
+        - name: id
+          in: path
+          description: ID da mensagem
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  description: Novo texto da mensagem
+                  example: "Mensagem atualizada completamente"
+      responses:
+        '200':
+          description: Mensagem atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+        '400':
+          description: Campo message é obrigatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    patch:
+      tags: [Mensagens]
+      summary: Atualiza parcialmente uma mensagem (concatena)
+      parameters:
+        - name: id
+          in: path
+          description: ID da mensagem
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  description: Texto para adicionar à mensagem existente
+                  example: "texto adicional"
+      responses:
+        '200':
+          description: Mensagem atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+        '400':
+          description: Campo message é obrigatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    delete:
+      tags: [Mensagens]
+      summary: Remove uma mensagem
+      parameters:
+        - name: id
+          in: path
+          description: ID da mensagem
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Mensagem removida com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Apagado com sucesso"
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
+components:
+  schemas:
+    Mensagem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único da mensagem
+          example: 1
+        message:
+          type: string
+          description: Texto da mensagem
+          example: "Exemplo de mensagem"
+      required: [id, message]
+    Erro:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+          example: "ID não encontrado"
+      required: [error]
