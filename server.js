@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 6664;
+const PORT = process.env.PORT || 6664;
 
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
